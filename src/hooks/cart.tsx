@@ -32,11 +32,10 @@ const CartContext = createContext<CartContext | null>(null);
 
 const CartProvider: React.FC = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [quantities, setQuantities] = useState<Quantity[]>([]);
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      const productsString = await AsyncStorage.getItem('@goMarketPlace:product')
+      const productsString = await AsyncStorage.getItem('@goMarketPlace:products')
 
       if (productsString) {
         const products = JSON.parse(productsString);
@@ -49,23 +48,63 @@ const CartProvider: React.FC = ({ children }) => {
   }, []);
 
   const addToCart = useCallback(async (product: Product) => {
-    // TODO ADD A NEW ITEM TO THE CART
     const checkProductQuantity = products.map(prod => {
       if (prod.id === product.id) {
         return prod.quantity;
+      } else {
+        return 0;
       }
     });
 
-    console.log(checkProductQuantity);
-    // let quantity = 1
-    if (checkProductQuantity) {
-      const quantity = Number(checkProductQuantity) + 1;
-      await AsyncStorage.setItem('@goMarketPlace:product', JSON.stringify({ product, quantity: quantity }))
+    console.log('check', checkProductQuantity, checkProductQuantity.length);
+
+    let previousQuantity = Number(0);
+
+    if (checkProductQuantity.length > 0) {
+      const reducer = (accumulator: any, currentValue: any) => accumulator + currentValue || 0;
+      previousQuantity = Number(checkProductQuantity.reduce(reducer));
+
+      console.log(previousQuantity);
+    }
+    previousQuantity = previousQuantity ? previousQuantity : 0;
+
+    const quantity = 1 + previousQuantity;
+
+    console.log('new quantity', quantity)
+
+    if (quantity > 1) {
+      console.log('se maior que 1');
+
+      products.map(prod => {
+        if (prod.id === product.id) {
+          prod.quantity = prod.quantity + 1;
+          const cantidade = prod.quantity;
+
+          return cantidade;
+
+        }
+      }
+      );
+
+      setProducts(products);
     } else {
-      const quantity = 1;
-      await AsyncStorage.setItem('@goMarketPlace:product', JSON.stringify({ ...product, quantity: quantity }))
+      // console.log('menor igual 1');
+      const newProduct = {
+        id: product.id,
+        title: product.title,
+        image_url: product.image_url,
+        price: product.price,
+        quantity
+      };
+
+      setProducts([...products, newProduct]);
+      products.push(newProduct);
+
     }
 
+    await AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
+    // console.log('products', products);
+    // console.log('***************************');
   }, []);
 
   const increment = useCallback(async id => {
