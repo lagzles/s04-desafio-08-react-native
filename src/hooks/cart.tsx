@@ -60,7 +60,7 @@ const CartProvider: React.FC = ({ children }) => {
       const reducer = (accumulator: any, currentValue: any) => accumulator + currentValue || 0;
       previousQuantity = Number(checkProductQuantity.reduce(reducer));
 
-      console.log(previousQuantity);
+      // console.log(previousQuantity);
     }
     previousQuantity = previousQuantity ? previousQuantity : 0;
 
@@ -104,7 +104,6 @@ const CartProvider: React.FC = ({ children }) => {
   }, []);
 
   const increment = useCallback(async id => {
-    // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
     products.map(prod => {
       if (prod.id === id) {
         prod.quantity = prod.quantity + 1;
@@ -118,6 +117,8 @@ const CartProvider: React.FC = ({ children }) => {
 
     setProducts(products);
     await AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
+
+    return products
 
   }, []);
 
@@ -134,13 +135,28 @@ const CartProvider: React.FC = ({ children }) => {
     const reducer = (accu: number, current: number) => accu + current;
     const quantity = quantityList.reduce(reducer);
     if (quantity === 0) {
+      const verifyQuantity = (product: Product) => product.quantity === 0 ? products.lastIndexOf(product) : '';
 
+      const indexOfProduct = products.map(verifyQuantity).reduce(reducer);
+      // console.log(lastIndexOf);
+
+      // const indexOfProduct = lastIndexOf.reduce(reducer);
+      console.log('index ', indexOfProduct);
+
+      const productsNewList = products.splice(indexOfProduct, 1);
+      console.log('nova lista ', productsNewList);
+
+      setProducts(productsNewList);
+      await AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(productsNewList));
+      console.log(productsNewList);
+
+    } else {
+      console.log(products);
+      setProducts(products);
+      await AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
 
     }
-    console.log(products)
 
-    setProducts(products);
-    await AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
 
   }, []);
 
