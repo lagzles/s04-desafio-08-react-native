@@ -73,22 +73,18 @@ const CartProvider: React.FC = ({ children }) => {
 
   // retirada de produtos
   const decrement = useCallback(async id => {
-    const quantityList = products.map(prod => {
-      if (prod.id === id) {
-        prod.quantity = prod.quantity - 1;
-        const cantidade = prod.quantity;
-        return cantidade;
-      } else { return 0; }
-    });
 
-    const reducer = (accu: number, current: number) => accu + current;
-    const quantity = quantityList.reduce(reducer);
-    if (quantity === 0) {
-      setProducts(products => products.filter(product => product.id !== id))
-    } else {
-      setProducts(products);
+    const productInCart = products.find(product => product.id === id);
+
+    if (productInCart) {
+      productInCart.quantity -= 1;
+
+      if (productInCart.quantity <= 0) {
+        setProducts(products => products.filter(product => product.id !== id))
+      } else {
+        setProducts(products => [...products]);
+      }
     }
-
   }, [products]);
 
   const value = React.useMemo(
