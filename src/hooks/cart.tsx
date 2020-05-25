@@ -43,9 +43,9 @@ const CartProvider: React.FC = ({ children }) => {
     loadProducts();
   }, []);
 
-  useEffect(() => {
-    AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
-  }, [products])
+  // useEffect(() => {
+  //   AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
+  // }, [products])
 
   const addToCart = useCallback(async (product: Product) => {
     const checkProduct = products.find(prod => prod.id === product.id);
@@ -53,11 +53,10 @@ const CartProvider: React.FC = ({ children }) => {
     if (checkProduct) {
       checkProduct.quantity += 1;
       setProducts(products => [...products]);
-      return;
     } else {
       setProducts(products => [...products, { ...product, quantity: 1 }]);
-      return;
     }
+    AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
   }, [products]);
 
   // incremento de produtos
@@ -67,6 +66,7 @@ const CartProvider: React.FC = ({ children }) => {
     if (productInCart) {
       productInCart.quantity += 1;
       setProducts(products => [...products]);
+      AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
       return;
     }
   }, [products]);
@@ -85,6 +85,9 @@ const CartProvider: React.FC = ({ children }) => {
         setProducts(products => [...products]);
       }
     }
+
+    AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
+
   }, [products]);
 
   const value = React.useMemo(
