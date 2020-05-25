@@ -62,17 +62,13 @@ const CartProvider: React.FC = ({ children }) => {
 
   // incremento de produtos
   const increment = useCallback(async id => {
-    products.map(prod => {
-      if (prod.id === id) {
-        prod.quantity = prod.quantity + 1;
-        const cantidade = prod.quantity;
+    const productInCart = products.find(prod => prod.id === id);
 
-        return cantidade;
-      }
+    if (productInCart) {
+      productInCart.quantity += 1;
+      setProducts(products => [...products]);
+      return;
     }
-    );
-
-    setProducts(products => [...products]);
   }, [products]);
 
   // retirada de produtos
