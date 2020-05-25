@@ -30,6 +30,7 @@ const CartProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
+      const dart = await AsyncStorage.removeItem('@goMarketPlace:products')
       const productsString = await AsyncStorage.getItem('@goMarketPlace:products')
 
       if (productsString) {
@@ -51,7 +52,7 @@ const CartProvider: React.FC = ({ children }) => {
       }
     });
 
-    console.log('check', checkProductQuantity, checkProductQuantity.length);
+    // console.log('check', checkProductQuantity, checkProductQuantity.length);
 
     let previousQuantity = Number(0);
 
@@ -65,10 +66,10 @@ const CartProvider: React.FC = ({ children }) => {
 
     const quantity = 1 + previousQuantity;
 
-    console.log('new quantity', quantity)
+    // console.log('new quantity', quantity)
 
     if (quantity > 1) {
-      console.log('se maior que 1');
+      // console.log('se maior que 1');
 
       products.map(prod => {
         if (prod.id === product.id) {
@@ -122,16 +123,21 @@ const CartProvider: React.FC = ({ children }) => {
 
   const decrement = useCallback(async id => {
     // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
-    products.map(prod => {
+    const quantityList = products.map(prod => {
       if (prod.id === id) {
         prod.quantity = prod.quantity - 1;
         const cantidade = prod.quantity;
-
         return cantidade;
+      } else { return 0; }
+    });
 
-      }
+    const reducer = (accu: number, current: number) => accu + current;
+    const quantity = quantityList.reduce(reducer);
+    if (quantity === 0) {
+
+
     }
-    );
+    console.log(products)
 
     setProducts(products);
     await AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
