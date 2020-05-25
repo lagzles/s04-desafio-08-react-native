@@ -23,11 +23,6 @@ interface CartContext {
   decrement(id: string): void;
 }
 
-interface Quantity {
-  id: string;
-  value: number
-}
-
 const CartContext = createContext<CartContext | null>(null);
 
 const CartProvider: React.FC = ({ children }) => {
@@ -109,10 +104,38 @@ const CartProvider: React.FC = ({ children }) => {
 
   const increment = useCallback(async id => {
     // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
+    products.map(prod => {
+      if (prod.id === id) {
+        prod.quantity = prod.quantity + 1;
+        const cantidade = prod.quantity;
+
+        return cantidade;
+
+      }
+    }
+    );
+
+    setProducts(products);
+    await AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
+
   }, []);
 
   const decrement = useCallback(async id => {
     // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
+    products.map(prod => {
+      if (prod.id === id) {
+        prod.quantity = prod.quantity - 1;
+        const cantidade = prod.quantity;
+
+        return cantidade;
+
+      }
+    }
+    );
+
+    setProducts(products);
+    await AsyncStorage.setItem('@goMarketPlace:products', JSON.stringify(products));
+
   }, []);
 
   const value = React.useMemo(
