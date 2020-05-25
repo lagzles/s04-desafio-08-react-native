@@ -23,21 +23,24 @@ interface CartContext {
   decrement(id: string): void;
 }
 
+interface Quantity {
+  id: string;
+  value: number
+}
+
 const CartContext = createContext<CartContext | null>(null);
 
 const CartProvider: React.FC = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [quantities, setQuantities] = useState<Quantity[]>([]);
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO LOAD ITEMS FROM ASYNC STORAGE
       const productsString = await AsyncStorage.getItem('@goMarketPlace:product')
-      // [[id, quantiade], [id, quantidade]]
-      // const quantitiesString = await AsyncStorage.getItem('@goMarketPlace:quantities')
 
       if (productsString) {
-
         const products = JSON.parse(productsString);
+
         setProducts(products);
       }
     }
@@ -45,9 +48,23 @@ const CartProvider: React.FC = ({ children }) => {
     loadProducts();
   }, []);
 
-  const addToCart = useCallback(async product => {
+  const addToCart = useCallback(async (product: Product) => {
     // TODO ADD A NEW ITEM TO THE CART
+    const checkProductQuantity = products.map(prod => {
+      if (prod.id === product.id) {
+        return prod.quantity;
+      }
+    });
 
+    console.log(checkProductQuantity);
+    // let quantity = 1
+    if (checkProductQuantity) {
+      const quantity = Number(checkProductQuantity) + 1;
+      await AsyncStorage.setItem('@goMarketPlace:product', JSON.stringify({ product, quantity: quantity }))
+    } else {
+      const quantity = 1;
+      await AsyncStorage.setItem('@goMarketPlace:product', JSON.stringify({ ...product, quantity: quantity }))
+    }
 
   }, []);
 
